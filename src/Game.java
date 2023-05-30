@@ -108,6 +108,7 @@ public class Game {
 
         unpackArchive(pathToArchFile, extractPath);
         listDeserializationGamers = deserializationFile(extractPath);
+
         return true;
     }
 
@@ -171,7 +172,6 @@ public class Game {
             }
         }
 
-
         return list;
     }
 
@@ -194,32 +194,21 @@ public class Game {
         ZipOutputStream zout;
         FileInputStream fis;
         ZipEntry entry;
-        try {
 
+        try {
             File saveFolder = new File(pathSaveFolder);
 
-            File archFile = new File(pathArchive);
-            if (archFile.exists()) {
-                archFile.delete();
-            }
-
-            File archFolder = new File(pathSaveFolder + "\\archive");
-            if (archFolder.exists()) {
-                for (File file : archFolder.listFiles()) {
-                    file.delete();
-                }
-                archFolder.delete();
-            }
+            deleteFileOrFolder(pathArchive);
+            deleteFileOrFolder(pathSaveFolder + "\\archive");
 
             zout = new ZipOutputStream(new FileOutputStream(pathArchive));
 
             if (saveFolder.isDirectory()) {
-
                 for (File savefile : saveFolder.listFiles()) {
 
                     if (savefile.getName().substring(savefile.getName().lastIndexOf(".") + 1).equals("zip")) {
                         /*можно добавить массив или список во входящие, в котором будут перечислены все расширения для исключения
-                          и проверять текущее расширение на вхождение в массиd или список
+                          и проверять текущее расширение на вхождение в массив или список
                         */
                         continue;
                     }
@@ -240,7 +229,7 @@ public class Game {
                 zout.close();
 
                 if (deletePackedFiles) {
-                    deleteFileInFolder(listFilesForDelete);
+                    deleteFiles(listFilesForDelete);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -251,12 +240,28 @@ public class Game {
     }
 
     /**
+     * Метод выполняет удаление каталога и внутренних файлов каталога или файла по заданному пути
+     *
+     * @param path - путь папке или файлу
+     */
+    private void deleteFileOrFolder(String path) {
+        File fso = new File(path);
+
+        if (fso.isDirectory()) {
+            for (File file : fso.listFiles()) {
+                file.delete();
+            }
+        }
+        fso.delete();
+    }
+
+    /**
      * Метод выполняет удаление файлов по строго переданному списку
      *
      * @param listFiles - принимает на вход список файлов
      * @return - не возвращает значений
      */
-    private void deleteFileInFolder(List<File> listFiles) {
+    private void deleteFiles(List<File> listFiles) {
         for (File file : listFiles) {
             file.delete();
         }
